@@ -1,0 +1,135 @@
+#FROM openanalytics/r-base
+
+#MAINTAINER Tobias Verbeke "tobias.verbeke@openanalytics.eu"
+FROM ubuntu:trusty
+
+ARG DEBIAN_FRONTED='noninteractive'
+
+RUN useradd docker \
+	&& mkdir /home/docker \
+	&& chown docker:docker /home/docker \
+	&& addgroup docker staff
+RUN echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
+	&& locale-gen en_US.utf8 \
+	&& /usr/sbin/update-locale LANG=en_US.UTF-8
+ENV LC_ALL en_US.UTF-8
+ENV LANG en_US.UTF-8
+
+
+
+## Install some useful tools and dependencies for MRO
+RUN apt-get update \
+	&& apt-get install -y --no-install-recommends \
+	ca-certificates \
+	curl \
+        wget \
+	&& rm -rf /var/lib/apt/lists/*
+
+
+WORKDIR /home/docker
+
+# Download, valiate, and unpack
+#RUN curl -LO -# https://mran.microsoft.com/install/mro/3.3.2/microsoft-r-open-3.3.2.tar.gz
+#RUN wget -P /home/docker https://mran.microsoft.com/install/mro/3.3.2/microsoft-r-open-3.3.2.tar.gz
+COPY microsoft-r-open-3.3.2.tar.gz /home/docker
+RUN echo "817aca692adffe20e590fc5218cb6992f24f29aa31864465569057534bce42c7 microsoft-r-open-3.3.2.tar.gz" > checksum.txt \
+	&& sha256sum -c --strict checksum.txt \
+	&& tar -xf microsoft-r-open-3.3.2.tar.gz
+
+# Install MRO, which inkludes MKL, see https://mran.microsoft.com/documents/rro/installation/
+WORKDIR /home/docker/microsoft-r-open
+RUN ./install.sh -a -u \
+	&& ls logs && cat logs/*
+
+# Print MKL and MRO EULAs on every start
+#ENV PROFILE /usr/lib64/microsoft-r/3.3/lib64/R/etc/Rprofile.site
+#RUN cp MKL_EULA.txt /home/docker/MKL_EULA.txt \
+	#&& cp MKL_EULA.txt /home/docker/MRO_EULA.txt \
+	#&& echo 'cat("\n", readLines("/home/docker/MKL_EULA.txt"), "\n", sep="\n")' >> $PROFILE \
+	#&& echo 'cat("\n", readLines("/home/docker/MRO_EULA.txt"), "\n", sep="\n")' >> $PROFILE
+
+# Clean up
+WORKDIR /home/docker
+RUN rm microsoft-r-open-3.3.2.tar.gz \
+	&& rm checksum.txt \
+&& rm -r microsoft-r-open
+
+# system libraries of general use
+RUN apt-get update && apt-get install -y \
+    sudo \
+    pandoc \
+    pandoc-citeproc \
+    libcurl4-gnutls-dev \
+    libcairo2-dev \
+    libxt-dev \
+    libssl-dev \
+    libssh2-1-dev \
+    libssl1.0.0 \
+    libxml2-dev \
+    libssl-dev
+
+# system library dependency for the euler app
+RUN apt-get update && apt-get install -y \
+    libmpfr-dev \
+    gfortran \
+    aptitude \
+    libgdal-dev \
+    libproj-dev \
+    g++ \
+    build-essential
+
+COPY Makeconf /usr/lib64/microsoft-r/3.3/lib64/R/etc/Makeconf
+
+# basic shiny functionality
+RUN  R -e "install.packages('rmarkdown', repos='http://cran.rstudio.com/')"
+RUN R -e "install.packages(c('shiny'), repos='http://cran.rstudio.com/')" \
+&& R -e "install.packages('binom', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('dplyr', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('ggplot2', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('reshape', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('curl', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('httr', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('devtools', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('formattable', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('car', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('fmsb', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('igraph', repos='https://cran.r-project.org/')" \
+&& sudo su - -c "R -e \"install.packages('miniUI', repos='https://cran.r-project.org/');options(unzip = 'internal'); devtools::install_github('daattali/shinyjs')\"" \
+#RUN R -e "options(unzip = 'internal'); devtools::install_github('daattali/shinyjs')" \
+&& R -e "install.packages('scales', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('crosstalk', repos='https://cran.r-project.org/')" \
+&& sudo su - -c "R -e \"options(unzip = 'internal'); devtools::install_github('rstudio/DT')\"" \
+#RUN R -e "devtools::install_github('rstudio/DT')" \
+&& sudo su - -c "R -e \"install.packages(c('raster', 'sp', 'viridis'), repos='https://cran.r-project.org/');options(unzip = 'internal'); devtools::install_github('rstudio/leaflet')\"" \
+&& sudo su - -c "R -e \"options(unzip = 'internal'); devtools::install_github('bhaskarvk/leaflet.extras')\"" \
+&& R -e "install.packages('ggrepel', repos='https://cran.r-project.org/')" \
+#RUN R -e "install.packages('leaflet', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('visNetwork', repos='https://cran.r-project.org/')" \
+&& sudo su - -c "R -e \"options(unzip = 'internal'); devtools::install_version('highcharter', version = '0.5.0', repos = 'https://cran.r-project.org/')\"" \
+#RUN R -e "download.file(url = 'http://cran.r-project.org/src/contrib/Archive/highcharter/highcharter_0.3.0.tar.gz', destfile = 'highcharter_0.3.0.tar.gz')"
+#RUN R -e "install.packages(pkgs='highcharter_0.3.0.tar.gz', type='source', repos=NULL)"
+#RUN R -e "unlink('highcharter_0.3.0.tar.gz')"
+&& R -e "install.packages('shinyBS', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('data.table', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('maptools', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('rgdal', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('googleVis', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('future', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('tidyr', repos='https://cran.r-project.org/')"\
+&& sudo su - -c "R -e \"options(unzip = 'internal'); devtools::install_github('daattali/timevis')\""\
+&& R -e "install.packages('shinythemes', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('formattable', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('fst', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('leaflet.minicharts', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('RColorBrewer', repos='https://cran.r-project.org/')" \ 
+&& R -e "install.packages('shinyWidgets', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('shinyjqui', repos='https://cran.r-project.org/')"  \
+&& R -e "install.packages('collapsibleTree', repos='https://cran.r-project.org/')" 
+COPY Rprofile.site /usr/lib64/microsoft-r/3.3/lib64/R/etc/
+
+
+EXPOSE 3838
+#CMD ["R", "-e shiny::runExample('01_hello')"]
+
+CMD ["R", "-e shiny::runApp('/root/monap')"]
+
