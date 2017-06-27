@@ -1,5 +1,3 @@
-MAINTAINER Alexey Kuzmenkov "alexey.kuzmenkov@antibiotic.ru"
-
 FROM ubuntu:trusty
 
 ARG DEBIAN_FRONTED='noninteractive'
