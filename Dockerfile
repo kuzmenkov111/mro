@@ -23,11 +23,10 @@ RUN apt-get update \
 	&& rm -rf /var/lib/apt/lists/*
 
 
-
 WORKDIR /home/docker
 
 # Download, valiate, and unpack and install Micrisift R open
-RUN wget  https://www.dropbox.com/s/xrkzdhm1cq0ll1q/microsoft-r-open-3.3.2.tar.gz?dl=1 -O microsoft-r-open-3.3.2.tar.gz \
+RUN wget microsoft-r-open-3.3.2.tar.gz -P /home/docker/ https://www.dropbox.com/s/xrkzdhm1cq0ll1q/microsoft-r-open-3.3.2.tar.gz \
 && echo "817aca692adffe20e590fc5218cb6992f24f29aa31864465569057534bce42c7 microsoft-r-open-3.3.2.tar.gz" > checksum.txt \
 	&& sha256sum -c --strict checksum.txt \
 	&& tar -xf microsoft-r-open-3.3.2.tar.gz \
@@ -64,12 +63,20 @@ RUN apt-get update && apt-get install -y \
     libgdal-dev \
     libproj-dev \
     g++ \
+    libicu-dev \
+    libpcre2-dev\
+    libbz2-dev \
+    liblzma-dev \
+    openjdk-7-jdk \
     build-essential
 
 COPY Makeconf /usr/lib64/microsoft-r/3.3/lib64/R/etc/Makeconf
 
+RUN sudo R CMD javareconf
+
+
 # basic shiny functionality
-RUN  R -e "install.packages('rmarkdown', repos='http://cran.rstudio.com/')"
+RUN  R -e "install.packages('rmarkdown', repos='http://cran.rstudio.com/')" \
 RUN R -e "install.packages(c('shiny'), repos='http://cran.rstudio.com/')" \
 && R -e "install.packages('binom', repos='https://cran.r-project.org/')" \
 && R -e "install.packages('dplyr', repos='https://cran.r-project.org/')" \
@@ -112,11 +119,11 @@ RUN R -e "install.packages(c('shiny'), repos='http://cran.rstudio.com/')" \
 && R -e "install.packages('RColorBrewer', repos='https://cran.r-project.org/')" \ 
 && R -e "install.packages('shinyWidgets', repos='https://cran.r-project.org/')" \
 && R -e "install.packages('shinyjqui', repos='https://cran.r-project.org/')"  \
-&& R -e "install.packages('collapsibleTree', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('collapsibleTree', repos='https://cran.r-project.org/')"  \
 && sudo su - -c "R -e \"options(unzip = 'internal'); devtools::install_github('kuzmenkov111/shinyURL')\"" \
-&& R -e "install.packages('RCurl', repos='https://cran.r-project.org/')"\
-&& R -e "install.packages('shinycssloaders', repos='https://cran.r-project.org/')"
-
+&& R -e "install.packages('RCurl', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('shinycssloaders', repos='https://cran.r-project.org/')" \
+&& sudo R -e "install.packages('ReporteRs', repos='https://cran.r-project.org/')"
 
 COPY Rprofile.site /usr/lib64/microsoft-r/3.3/lib64/R/etc/
 
