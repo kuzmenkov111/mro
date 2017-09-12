@@ -120,10 +120,11 @@ RUN R -e "install.packages(c('shiny'), repos='http://cran.rstudio.com/')" \
 && R -e "install.packages('shinyWidgets', repos='https://cran.r-project.org/')" \
 && R -e "install.packages('shinyjqui', repos='https://cran.r-project.org/')"  \
 && R -e "install.packages('collapsibleTree', repos='https://cran.r-project.org/')"  \
-&& sudo su - -c "R -e \"options(unzip = 'internal'); devtools::install_github('kuzmenkov111/shinyURL')\"" \
+#&& sudo su - -c "R -e \"options(unzip = 'internal'); devtools::install_github('kuzmenkov111/shinyURL')\"" \
 && R -e "install.packages('RCurl', repos='https://cran.r-project.org/')" \
 && R -e "install.packages('shinycssloaders', repos='https://cran.r-project.org/')" \
-&& sudo R -e "install.packages('ReporteRs', repos='https://cran.r-project.org/')"
+&& sudo R -e "install.packages('ReporteRs', repos='https://cran.r-project.org/')" \
+&& sudo su - -c "R -e \"options(unzip = 'internal'); devtools::install_github('hrbrmstr/qrencoder')\""
 
 COPY Rprofile.site /usr/lib64/microsoft-r/3.3/lib64/R/etc/
 
