@@ -26,10 +26,11 @@ RUN apt-get update \
 WORKDIR /home/docker
 
 # Download, valiate, and unpack and install Micrisift R open
-RUN sudo  wget microsoft-r-open-3.3.2.tar.gz -P /home/docker/ https://www.dropbox.com/s/xrkzdhm1cq0ll1q/microsoft-r-open-3.3.2.tar.gz
-RUN echo "817aca692adffe20e590fc5218cb6992f24f29aa31864465569057534bce42c7 microsoft-r-open-3.3.2.tar.gz" > checksum.txt \
+RUN wget  https://www.dropbox.com/s/xrkzdhm1cq0ll1q/microsoft-r-open-3.3.2.tar.gz?dl=1 -O microsoft-r-open-3.3.2.tar.gz \
+&& echo "817aca692adffe20e590fc5218cb6992f24f29aa31864465569057534bce42c7 microsoft-r-open-3.3.2.tar.gz" > checksum.txt \
 	&& sha256sum -c --strict checksum.txt \
 	&& tar -xf microsoft-r-open-3.3.2.tar.gz \
 	&& cd /home/docker/microsoft-r-open \
 	&& ./install.sh -a -u \
 	&& ls logs && cat logs/*
+
