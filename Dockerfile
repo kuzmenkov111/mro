@@ -68,6 +68,7 @@ RUN apt-get update && apt-get install -y \
     libbz2-dev \
     liblzma-dev \
     openjdk-7-jdk \
+    libnlopt-dev \
     build-essential
 
 COPY Makeconf /usr/lib64/microsoft-r/3.3/lib64/R/etc/Makeconf
