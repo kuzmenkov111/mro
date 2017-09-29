@@ -133,6 +133,7 @@ RUN R -e "install.packages(c('shiny'), repos='http://cran.rstudio.com/')" \
 COPY Rprofile.site /usr/lib64/microsoft-r/3.3/lib64/R/etc/
 
 
+
 EXPOSE 3838
 
 CMD ["R", "-e shiny::runApp('/root/monap')"]
