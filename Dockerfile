@@ -132,6 +132,7 @@ RUN R -e "install.packages(c('shiny'), repos='http://cran.rstudio.com/')" \
 && R -e "install.packages('raster', repos='https://cran.r-project.org/')" \
 && R -e "install.packages('digest', repos='https://cran.r-project.org/')" \
 && R -e "install.packages('bcrypt', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('radarchart', repos='https://cran.r-project.org/')" \
 && sudo su - -c "R -e \"options(unzip = 'internal'); devtools::install_github('hrbrmstr/qrencoder')\""
 
 COPY Rprofile.site /usr/lib64/microsoft-r/3.3/lib64/R/etc/
