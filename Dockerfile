@@ -74,12 +74,11 @@ RUN apt-get update && apt-get install -y \
 COPY Makeconf /usr/lib64/microsoft-r/3.3/lib64/R/etc/Makeconf
 
 #RUN sudo R CMD javareconf
-
+RUN sudo apt-get install -y ncbi-blast+
 
 # basic shiny functionality
 RUN sudo R -e "install.packages('rmarkdown', repos='http://cran.rstudio.com/')" \
-&& sudo apt-get install -y ncbi-blast+ \
-RUN R -e "install.packages(c('shiny'), repos='http://cran.rstudio.com/')" \
+&& R -e "install.packages(c('shiny'), repos='http://cran.rstudio.com/')" \
 && R -e "install.packages('binom', repos='https://cran.r-project.org/')" \
 && R -e "install.packages('dplyr', repos='https://cran.r-project.org/')" \
 && R -e "install.packages('purrr', repos='https://cran.r-project.org/')" \
