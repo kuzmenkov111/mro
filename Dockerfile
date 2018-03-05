@@ -77,7 +77,8 @@ COPY Makeconf /usr/lib64/microsoft-r/3.3/lib64/R/etc/Makeconf
 
 
 # basic shiny functionality
-RUN  R -e "install.packages('rmarkdown', repos='http://cran.rstudio.com/')" \
+RUN sudo R -e "install.packages('rmarkdown', repos='http://cran.rstudio.com/')" \
+&& sudo apt-get install -y ncbi-blast+ \
 RUN R -e "install.packages(c('shiny'), repos='http://cran.rstudio.com/')" \
 && R -e "install.packages('binom', repos='https://cran.r-project.org/')" \
 && R -e "install.packages('dplyr', repos='https://cran.r-project.org/')" \
@@ -133,7 +134,12 @@ RUN R -e "install.packages(c('shiny'), repos='http://cran.rstudio.com/')" \
 && R -e "install.packages('digest', repos='https://cran.r-project.org/')" \
 && R -e "install.packages('bcrypt', repos='https://cran.r-project.org/')" \
 && R -e "install.packages('radarchart', repos='https://cran.r-project.org/')" \
-&& sudo su - -c "R -e \"options(unzip = 'internal'); devtools::install_github('hrbrmstr/qrencoder')\""
+&& sudo su - -c "R -e \"options(unzip = 'internal'); devtools::install_github('hrbrmstr/qrencoder')\""\
+&& R -e "source('https://bioconductor.org/biocLite.R'); biocLite(); biocLite('Biostrings')" \
+&& sudo su - -c "R -e \"options(unzip = 'internal'); devtools::install_github('kuzmenkov111/rBLAST')\"" \
+&& R -e "install.packages('msaR', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('RColorBrewer', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('stringi', repos='https://cran.r-project.org/')" 
 
 COPY Rprofile.site /usr/lib64/microsoft-r/3.3/lib64/R/etc/
 
