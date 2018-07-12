@@ -26,20 +26,21 @@ RUN apt-get update \
 WORKDIR /home/docker
 
 # Download, valiate, and unpack and install Micrisift R open
-RUN wget  https://www.dropbox.com/s/xrkzdhm1cq0ll1q/microsoft-r-open-3.3.2.tar.gz?dl=1 -O microsoft-r-open-3.3.2.tar.gz \
-&& echo "817aca692adffe20e590fc5218cb6992f24f29aa31864465569057534bce42c7 microsoft-r-open-3.3.2.tar.gz" > checksum.txt \
-    && sha256sum -c --strict checksum.txt \
-    && tar -xf microsoft-r-open-3.3.2.tar.gz \
-    && cd /home/docker/microsoft-r-open \
-    && ./install.sh -a -u \
-    && ls logs && cat logs/*
+Rwget https://www.dropbox.com/s/k42g2ra7ll46omp/microsoft-r-open-3.5.0.tar.gz?dl=1 -O microsoft-r-open-3.5.0.tar.gz \
+&& echo "7E1091587429C1545804B514269F4B0C588B85EC86052B512AAFD491DB797D93 microsoft-r-open-3.5.0.tar.gz" > checksum.txt \
+	&& sha256sum -c --strict checksum.txt \
+	&& tar -xf microsoft-r-open-3.5.0.tar.gz \
+	&& cd /home/docker/microsoft-r-open \
+	&& ./install.sh -a -u \
+	&& ls logs && cat logs/*
 
 
 # Clean up
 WORKDIR /home/docker
-RUN rm microsoft-r-open-3.3.2.tar.gz \
+RUN rm microsoft-r-open-3.5.0.tar.gz \
 	&& rm checksum.txt \
 && rm -r microsoft-r-open
+
 
 # system libraries of general use
 RUN apt-get update && apt-get install -y \
@@ -72,6 +73,11 @@ RUN apt-get update && apt-get install -y \
     build-essential
 
 COPY Makeconf /usr/lib64/microsoft-r/3.3/lib64/R/etc/Makeconf
+
+RUN sudo apt-add-repository -y ppa:webupd8team/java \
+&& apt-get update && echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | sudo debconf-set-selections && apt-get install -y oracle-java8-installer \
+&& R -e "Sys.setenv(JAVA_HOME = '/usr/lib/jvm/java-8-oracle/jre')"
+RUN sudo java -version
 
 #RUN sudo R CMD javareconf
 RUN sudo apt-get install -y ncbi-blast+
@@ -138,7 +144,18 @@ RUN sudo R -e "install.packages('rmarkdown', repos='http://cran.rstudio.com/')" 
 && sudo su - -c "R -e \"options(unzip = 'internal'); devtools::install_github('kuzmenkov111/rBLAST')\"" \
 && R -e "install.packages('msaR', repos='https://cran.r-project.org/')" \
 && R -e "install.packages('RColorBrewer', repos='https://cran.r-project.org/')" \
-&& R -e "install.packages('stringi', repos='https://cran.r-project.org/')" 
+&& R -e "install.packages('stringi', repos='https://cran.r-project.org/')" \
+&& R CMD javareconf \
+&& R -e "Sys.setenv(JAVA_HOME = '/usr/lib/jvm/java-8-oracle/jre'); install.packages('rJava', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('mailR', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('RPostgres', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('stringi', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('pool', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('DBI', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('GoodmanKruskal', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('rjson', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('uuid', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('shinytoastr', repos='https://cran.r-project.org/')" 
 
 COPY Rprofile.site /usr/lib64/microsoft-r/3.3/lib64/R/etc/
 
