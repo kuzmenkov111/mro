@@ -75,6 +75,12 @@ RUN apt-get update && apt-get install -y \
 
 #COPY Makeconf /usr/lib64/microsoft-r/3.3/lib64/R/etc/Makeconf
 
+RUN apt-get install -y software-properties-common
+RUN add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
+RUN apt-get update
+RUN apt-get install -y libudunits2-dev libgdal-dev libgeos-dev 
+
+
 RUN sudo apt-add-repository -y ppa:webupd8team/java \
 && apt-get update && echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | sudo debconf-set-selections && apt-get install -y oracle-java8-installer \
 && R -e "Sys.setenv(JAVA_HOME = '/usr/lib/jvm/java-8-oracle/jre')"
@@ -156,7 +162,12 @@ RUN sudo R -e "install.packages('rmarkdown', repos='http://cran.rstudio.com/')" 
 && R -e "install.packages('GoodmanKruskal', repos='https://cran.r-project.org/')" \
 && R -e "install.packages('rjson', repos='https://cran.r-project.org/')" \
 && R -e "install.packages('uuid', repos='https://cran.r-project.org/')" \
-&& R -e "install.packages('shinytoastr', repos='https://cran.r-project.org/')" 
+&& R -e "install.packages('stringr', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('shinytoastr', repos='https://cran.r-project.org/')" \
+&& sudo su - -c "R -e \"options(unzip = 'internal'); devtools::install_github('ropensci/plotly')\""\
+&& sudo su - -c "R -e \"options(unzip = 'internal'); devtools::install_github('stefanedwards/lemon')\""\
+&& sudo su - -c "R -e \"options(unzip = 'internal');  devtools::install_github('emitanaka/shinycustomloader')\"" 
+
 
 COPY Rprofile.site /usr/lib64/microsoft-r/3.3/lib64/R/etc/
 
