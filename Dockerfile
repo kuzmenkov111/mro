@@ -2,6 +2,7 @@ FROM ubuntu:trusty
 
 ARG DEBIAN_FRONTED='noninteractive'
 
+
 RUN useradd docker \
 	&& mkdir /home/docker \
 	&& chown docker:docker /home/docker \
@@ -72,7 +73,7 @@ RUN apt-get update && apt-get install -y \
     libnlopt-dev \
     build-essential
 
-COPY Makeconf /usr/lib64/microsoft-r/3.3/lib64/R/etc/Makeconf
+#COPY Makeconf /usr/lib64/microsoft-r/3.3/lib64/R/etc/Makeconf
 
 RUN sudo apt-add-repository -y ppa:webupd8team/java \
 && apt-get update && echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | sudo debconf-set-selections && apt-get install -y oracle-java8-installer \
