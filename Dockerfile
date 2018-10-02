@@ -27,10 +27,10 @@ RUN apt-get update \
 WORKDIR /home/docker
 
 # Download, valiate, and unpack and install Micrisift R open
-RUN wget https://www.dropbox.com/s/k42g2ra7ll46omp/microsoft-r-open-3.5.0.tar.gz?dl=1 -O microsoft-r-open-3.5.0.tar.gz \
-&& echo "7E1091587429C1545804B514269F4B0C588B85EC86052B512AAFD491DB797D93 microsoft-r-open-3.5.0.tar.gz" > checksum.txt \
+RUN wget https://www.dropbox.com/s/uz4e4d0frk21cvn/microsoft-r-open-3.5.1.tar.gz?dl=1 -O microsoft-r-open-3.5.1.tar.gz \
+&& echo "9791AAFB94844544930A1D896F2BF1404205DBF2EC059C51AE75EBB3A31B3792 microsoft-r-open-3.5.1.tar.gz" > checksum.txt \
 	&& sha256sum -c --strict checksum.txt \
-	&& tar -xf microsoft-r-open-3.5.0.tar.gz \
+	&& tar -xf microsoft-r-open-3.5.1.tar.gz \
 	&& cd /home/docker/microsoft-r-open \
 	&& ./install.sh -a -u \
 	&& ls logs && cat logs/*
@@ -38,7 +38,7 @@ RUN wget https://www.dropbox.com/s/k42g2ra7ll46omp/microsoft-r-open-3.5.0.tar.gz
 
 # Clean up
 WORKDIR /home/docker
-RUN rm microsoft-r-open-3.5.0.tar.gz \
+RUN rm microsoft-r-open-3.5.1.tar.gz \
 	&& rm checksum.txt \
 && rm -r microsoft-r-open
 
@@ -126,6 +126,8 @@ RUN sudo R -e "install.packages('rmarkdown', repos='http://cran.rstudio.com/')" 
 && R -e "install.packages('rgdal', repos='https://cran.r-project.org/')" \
 && R -e "install.packages('googleVis', repos='https://cran.r-project.org/')" \
 && R -e "install.packages('future', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('callr', repos='https://cran.r-project.org/')" \
+&& R -e "install.packages('future.callr', repos='https://cran.r-project.org/')" \
 && R -e "install.packages('tidyr', repos='https://cran.r-project.org/')"\
 && sudo su - -c "R -e \"options(unzip = 'internal'); devtools::install_github('daattali/timevis')\""\
 && R -e "install.packages('shinythemes', repos='https://cran.r-project.org/')" \
