@@ -24,24 +24,6 @@ RUN apt-get update \
 	&& rm -rf /var/lib/apt/lists/*
 
 
-WORKDIR /home/docker
-
-# Download, valiate, and unpack and install Micrisift R open
-RUN wget https://www.dropbox.com/s/uz4e4d0frk21cvn/microsoft-r-open-3.5.1.tar.gz?dl=1 -O microsoft-r-open-3.5.1.tar.gz \
-&& echo "9791AAFB94844544930A1D896F2BF1404205DBF2EC059C51AE75EBB3A31B3792 microsoft-r-open-3.5.1.tar.gz" > checksum.txt \
-	&& sha256sum -c --strict checksum.txt \
-	&& tar -xf microsoft-r-open-3.5.1.tar.gz \
-	&& cd /home/docker/microsoft-r-open \
-	&& ./install.sh -a -u \
-	&& ls logs && cat logs/*
-
-
-# Clean up
-WORKDIR /home/docker
-RUN rm microsoft-r-open-3.5.1.tar.gz \
-	&& rm checksum.txt \
-&& rm -r microsoft-r-open
-
 
 # system libraries of general use
 RUN apt-get update && apt-get install -y \
@@ -72,6 +54,25 @@ RUN apt-get update && apt-get install -y \
     openjdk-7-jdk \
     libnlopt-dev \
     build-essential
+    
+WORKDIR /home/docker
+
+# Download, valiate, and unpack and install Micrisift R open
+RUN wget https://www.dropbox.com/s/uz4e4d0frk21cvn/microsoft-r-open-3.5.1.tar.gz?dl=1 -O microsoft-r-open-3.5.1.tar.gz \
+&& echo "9791AAFB94844544930A1D896F2BF1404205DBF2EC059C51AE75EBB3A31B3792 microsoft-r-open-3.5.1.tar.gz" > checksum.txt \
+	&& sha256sum -c --strict checksum.txt \
+	&& tar -xf microsoft-r-open-3.5.1.tar.gz \
+	&& cd /home/docker/microsoft-r-open \
+	&& ./install.sh -a -u \
+	&& ls logs && cat logs/*
+
+
+# Clean up
+WORKDIR /home/docker
+RUN rm microsoft-r-open-3.5.1.tar.gz \
+	&& rm checksum.txt \
+&& rm -r microsoft-r-open
+
 
 #COPY Makeconf /usr/lib64/microsoft-r/3.3/lib64/R/etc/Makeconf
 
@@ -115,7 +116,6 @@ RUN sudo R -e "install.packages('rmarkdown', repos='http://cran.rstudio.com/')" 
 && R -e "install.packages('ggrepel', repos='https://cran.r-project.org/')" \
 #RUN R -e "install.packages('leaflet', repos='https://cran.r-project.org/')" \
 && R -e "install.packages('visNetwork', repos='https://cran.r-project.org/')" \
-
 && sudo su - -c "R -e \"options(unzip = 'internal'); devtools::install_github('kuzmenkov111/highcharter')\"" \
 #&& sudo su - -c "R -e \"options(unzip = 'internal'); devtools::install_version('highcharter', version = '0.5.0', repos = 'https://cran.r-project.org/')\"" \
 #RUN R -e "download.file(url = 'http://cran.r-project.org/src/contrib/Archive/highcharter/highcharter_0.3.0.tar.gz', destfile = 'highcharter_0.3.0.tar.gz')"
@@ -172,7 +172,7 @@ RUN sudo R -e "install.packages('rmarkdown', repos='http://cran.rstudio.com/')" 
 && sudo su - -c "R -e \"options(unzip = 'internal');  devtools::install_github('emitanaka/shinycustomloader')\"" 
 
 
-COPY Rprofile.site /usr/lib64/microsoft-r/3.3/lib64/R/etc/
+COPY Rprofile.site /opt/microsoft/ropen/3.5.1/lib64/R/etc/
 
 
 
